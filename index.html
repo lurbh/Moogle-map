@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*" />
+    <!-- Favicons -->
+    <link href="./img/singapore.png" rel="icon">
+    <!-- Stylesheet for Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Stylesheet for Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Stylesheet for Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" 
+    integrity="sha512-6ZCLMiYwTeli2rVh3XAPxy3YoR5fVxGdH/pz+KMCzRY2M65Emgkw00Yqmhh8qLGeYQ3LbVZGdmOX9KUjSKr0TA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/style.css">
+    <title>Moogle Map</title>
+</head>
+<body>
+    
+    <!-- A div container to display the map -->
+    <div id="singaporeMap">
+        <div id="map-container">
+            <button id="toggleSearchBtn" class="btn btn-info">Toggle Search</button>
+            <div id="search-container">
+                <input type="text" id="searchText" class="form-control mb-3"/>
+                <select name="datasets" id="datasets" class="form-select">
+                    <option value="onemap" selected="selected">Onemap</option>
+                    <option value="accommodation">Accommodation</option>
+                    <option value="attractions">Attractions</option>
+                    <option value="bars_clubs">Bars & Clubs</option>
+                    <option value="food_beverages">Food & Beverages</option>
+                    <option value="shops">Shops</option>
+                    <option value="venues">Venues</option>
+                  </select>
+                <button id="searchBtn" class="btn btn-primary">Search</button>
+            </div>
+            <div id="directions-container">
+                <input type="text" id="startText" class="form-control mb-3" placeholder="Postal Code / My Location"/>
+                <input type="text" id="endText" class="form-control mb-3" placeholder="Postal Code"/>
+                <button id="DirectionsBtn" class="btn btn-primary">Get Directions</button>
+            </div>
+            <div id="gpsicon">
+                <img id="gpsimg" src="img/gps.png">
+            </div>
+            <div id="directionicon">
+                <img id="directionimg" src="img/get-directions-button.png">
+            </div>
+            <div id="bustimings">
+                <button type="button" class="btn-close" aria-label="Close" id="busdivclose"></button>
+            </div>  
+        </div>  
+        
+    </div>
+    <div class="offcanvas offcanvas-start offcanvas-static" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasroute" aria-labelledby="offcanvasrouteLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasrouteLabel"></h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div>
+                <img id="routedrive" class="directiontype" src="img/sports-car.png">
+                <img id="routepublic" class="directiontype" src="img/public-transport.png">
+                <img id="routecycle" class="directiontype" src="img/bike.png">
+                <img id="routewalk" class="directiontype" src="img/walking.png">
+            </div>
+            <div id="offcanvasroutebody"></div>
+        </div>
+    </div>
+    <div class="offcanvas offcanvas-start offcanvas-static" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvassearch" aria-labelledby="offcanvassearchLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvassearchLabel"></h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div id="offcanvassearchbody"></div>
+        </div>
+    </div>
+    
+    
+    <!-- JavaScript for Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+
+    <!-- Marker Clustering JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js" integrity="sha512-OFs3W4DIZ5ZkrDhBFtsCP6JXtMEDGmhl0QPlmWYBJay40TT1n3gt2Xuw8Pf/iezgW9CdabjkNChRqozl/YADmg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    
+
+    <!-- Bootstrp Javascript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <!-- axios cdn -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="constvariables.js"></script>
+    <script src="data.js"></script>
+    <script src="Polyline.encoded.js"></script>
+    <script src="map.js"></script> 
+    <script src="datamall.js"></script>
+    <script src="onemap.js"></script>
+    <script src="tih.js"></script>
+    <script src="script.js"></script>
+    
+    
+</body>
+</html>

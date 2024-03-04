@@ -1,0 +1,246 @@
+#singaporeMap {
+    height: 100vh;
+    /* width: 100vh; */
+}
+
+.busstopcard{
+    min-width: 250px;
+    position: relative;
+}
+
+.busno {
+    border-radius: 25px;
+    margin: 5px;
+    background-color: chartreuse;
+    padding: 5px;
+    width: 40px;
+    font-weight: 700;
+    text-align: center;
+    display:inline-block;
+}
+
+#bustimings{
+    width: 100vw;
+    height: 100vh;
+    z-index: 1001;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -50vw;
+    background-color: whitesmoke;
+    display: none;
+    padding-top: 1rem;
+    overflow: scroll;
+}
+
+.offcanvas-static {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 300px; /* Adjust width as needed */
+    background-color: #fff; /* Optional: change background color */
+    box-shadow: -2px 0 2px rgba(0,0,0,.1); /* Optional: add shadow */
+    overflow-y: auto; /* Make offcanvas scrollable */
+  }
+
+#busdivclose{
+    color: black;
+    float: right;
+}
+
+.BusInfo {
+    padding: 3px;
+    margin: 1px;
+    border-radius: 20px;
+
+}
+
+.TimingButton {
+    position: absolute;
+    border-radius: 15px;
+    background-color: lightskyblue;
+    bottom: 0px;
+    right : 0px;
+}
+
+.busesholder{
+    max-width: 250px;
+}
+
+#map-container {
+    position: relative;
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#search-container {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 10px;
+    min-width: 250px;
+    max-width: 250px;
+    
+    display:none;
+
+}
+
+#directions-container{
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 10px;
+    min-width: 250px;
+    max-width: 250px;
+    
+    display:none;
+}
+
+#searchBtn {
+    float: right;
+}
+
+#datasets {
+    width: 70%;
+}
+
+.searchlist{
+    padding: 2px;
+}
+
+.searchlist:hover{
+    cursor: pointer;
+}
+
+#toggleSearchBtn {
+    position: absolute;
+    left: 50px;
+    top: 10px;
+    z-index: 1000;
+}
+
+#gpsicon {
+    position: absolute;
+    top: calc(100vh - 50px);
+    right: 5px;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px;
+}
+
+#gpsimg{
+    height: 20px;
+}
+
+#gpsimg:hover{
+    cursor: pointer;
+}
+
+#directionicon{
+    position: absolute;
+    top: 80px;
+    left: 10px;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.8);
+    
+    padding: 5px;
+}
+
+#directionimg {
+    height: 30px;
+}
+
+#directionimg:hover{
+    cursor: pointer;
+}
+
+.directiontype {
+    display:inline-block;
+    width: 40px;
+    padding: 5px;
+    margin: 5px;
+}
+
+.directiontypeselected {
+    display:inline-block;
+    width: 40px;
+    padding: 5px;
+    margin: 5px;
+    background-color: aquamarine;
+}
+
+.ruoteinstruction{
+    padding: 10px;
+}
+
+.directiontype:hover{
+    cursor: pointer;
+}
+
+.directiontypeimg {
+    width: 30px;
+    padding: 5px;
+    margin: 5px;
+}
+
+.directionButton{
+    position: absolute;
+    border-radius: 15px;
+    background-color: lightskyblue;
+    bottom: 10px;
+    right : 10px;
+}
+
+@media screen and (min-width: 767px ) {
+    #search-container {
+        display: block;
+        min-width: 300px;
+        max-width: 300px;
+        top: 20px;
+    }
+
+    #directions-container {
+        display: none;
+        min-width: 300px;
+        max-width: 300px;
+        top: 20px;
+    }
+
+    #toggleSearchBtn {
+        display: none;
+    }
+
+    #bustimings{
+        width: 80vw;
+        height: 70vh;
+        z-index: 1000;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -40vw;
+        margin-top: 15vh;
+        background-color: whitesmoke;
+        display: none;
+        padding-top: 1rem;
+        overflow: none;
+    }
+
+    .BusInfo {
+        padding: 5px;
+        margin: 5px;
+        border-radius: 20px; 
+    }
+
+    .offcanvas-static
+    {
+        width: 400px;
+    }
+}
