@@ -1,9 +1,19 @@
+let basemap;
+let darkbasemap;
+
 function LoadMap()
 {
     const mapholder = document.querySelector("#singaporeMap");
     mapholder.style.background = ``;
     const mymap = L.map('singaporeMap', {drawControl: true}).setView([1.3526, 103.8352], 13);
-    const basemap = L.tileLayer('https://www.onemap.gov.sg/maps/tiles/Default/{z}/{x}/{y}.png', {
+    basemap = L.tileLayer('	https://www.onemap.gov.sg/maps/tiles/Default_HD/{z}/{x}/{y}.png', {
+    detectRetina: true,
+    maxZoom: 19,
+    minZoom: 12,
+   /** DO NOT REMOVE the OneMap attribution below **/
+    attribution: '<img src="https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png" style="height:20px;width:20px;"/>&nbsp;<a href="https://www.onemap.gov.sg/" target="_blank" rel="noopener noreferrer">OneMap</a>&nbsp;&copy;&nbsp;contributors&nbsp;&#124;&nbsp;<a href="https://www.sla.gov.sg/" target="_blank" rel="noopener noreferrer">Singapore Land Authority</a>'
+    });
+    darkbasemap = L.tileLayer('https://www.onemap.gov.sg/maps/tiles/Night_HD/{z}/{x}/{y}.png', {
     detectRetina: true,
     maxZoom: 19,
     minZoom: 12,
@@ -12,6 +22,16 @@ function LoadMap()
     });
     basemap.addTo(mymap);
     return mymap;
+}
+
+function switchBaseLayer(layer, map) {
+    if (layer === 'default') {
+        basemap.addTo(map);
+        darkbasemap.removeFrom(map);
+    } else if (layer === 'dark') {
+        darkbasemap.addTo(map);
+        basemap.removeFrom(map);
+    }
 }
 
 function DrawBusStops(busstops, busstopLayer)

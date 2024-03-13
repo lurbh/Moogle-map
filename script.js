@@ -207,7 +207,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         
     });
     
-
+    const darkmode = document.querySelector("#themeimg");
+    darkmode.addEventListener("click", async function(){
+        const themeid = document.querySelector("#themeid");
+        themeid.value = themeid.value == "default" ? "dark" :"default";
+        console.log(themeid.value);
+        switchBaseLayer(themeid.value, map);
+    });
 });
 
 function Loading()
