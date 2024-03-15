@@ -354,7 +354,9 @@ function DrawCarparks(carparkdata,carparkLayer)
     });
     for (const p of carparkdata) 
     {
-        // console.log(p);
+        // console.log(p.Location);
+        if(!p.Location)
+            continue;
         const loc = p.Location.split(" ");
         const lat = loc[0];
         const lng = loc[1];

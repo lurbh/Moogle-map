@@ -1,14 +1,9 @@
 document.addEventListener("DOMContentLoaded", async function () {
     
     Loading();
-    // await LoadSelect();
     
     let bustopdata = [];
-    // let parksdata = [];
-    // let parkconnectorsdata = [];
     let bicycleparkingdata = [];
-    // let taxistandsdata = [];
-    // let mrtdata = [];
     let carparkdata = [];
     
     while (true)
@@ -529,18 +524,18 @@ function onClickSearch()
     offcanvas.show();
 }
 
-// async function LoadSelect()
-// {
-//     const selectList = document.querySelector("#datasets");
-//     const datalist = await GetDataset();
-//     for(let d of datalist)
-//     {
-//         let option = document.createElement("option");
-//         option.text = d;
-//         option.value = d;
-//         selectList.add(option);
-//     }
-// }
+async function LoadSelect()
+{
+    const selectList = document.querySelector("#datasets");
+    const datalist = await GetDataset();
+    for(let d of datalist)
+    {
+        let option = document.createElement("option");
+        option.text = d;
+        option.value = d;
+        selectList.add(option);
+    }
+}
 
 async function ONEMAPSEARCH(searchterms)
 {
