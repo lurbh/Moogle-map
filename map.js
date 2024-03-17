@@ -1,11 +1,16 @@
 let basemap;
 let darkbasemap;
 
+/**
+ * Function to Load Leaflet Map
+ * @returns loade Map
+ */
 function LoadMap()
 {
     const mapholder = document.querySelector("#singaporeMap");
     mapholder.style.background = ``;
     const mymap = L.map('singaporeMap', {drawControl: true}).setView([1.3526, 103.8352], 13);
+    // Normal map
     basemap = L.tileLayer('	https://www.onemap.gov.sg/maps/tiles/Default_HD/{z}/{x}/{y}.png', {
     detectRetina: true,
     maxZoom: 19,
@@ -13,6 +18,7 @@ function LoadMap()
    /** DO NOT REMOVE the OneMap attribution below **/
     attribution: '<img src="https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png" style="height:20px;width:20px;"/>&nbsp;<a href="https://www.onemap.gov.sg/" target="_blank" rel="noopener noreferrer">OneMap</a>&nbsp;&copy;&nbsp;contributors&nbsp;&#124;&nbsp;<a href="https://www.sla.gov.sg/" target="_blank" rel="noopener noreferrer">Singapore Land Authority</a>'
     });
+    // dark map
     darkbasemap = L.tileLayer('https://www.onemap.gov.sg/maps/tiles/Night_HD/{z}/{x}/{y}.png', {
     detectRetina: true,
     maxZoom: 19,
@@ -24,6 +30,11 @@ function LoadMap()
     return mymap;
 }
 
+/**
+ * Function to switch to different map type
+ * @param {String} layer layer to change to
+ * @param {Map} map Map Object
+ */
 function switchBaseLayer(layer, map) {
     if (layer === 'default') {
         basemap.addTo(map);
@@ -34,6 +45,11 @@ function switchBaseLayer(layer, map) {
     }
 }
 
+/**
+ * Function to draw busstop markers on a layer
+ * @param {Array} busstops array of busstop
+ * @param {LeafletLayer} busstopLayer bus stop layer - marker clustering
+ */
 function DrawBusStops(busstops, busstopLayer)
 {
     let busIcon = L.icon({
@@ -43,10 +59,12 @@ function DrawBusStops(busstops, busstopLayer)
         iconAnchor:   [12.5, 12.5], // point of the icon which will correspond to marker's location
         popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
     });
+    // loop all busstop
     for(let bs of busstops)
     {
         const lat = bs.Latitude;
         const lng = bs.Longitude;
+        // add marker with custom icon and popup
         const marker = L.marker([lat, lng], {icon: busIcon});
         
         marker.bindPopup(function(){
@@ -62,11 +80,11 @@ function DrawBusStops(busstops, busstopLayer)
                 <button class="TimingButton">Get Bus Timings</button>
             `;
 
+            // function to get buses and process the data and display it
             async function getBuses() {
                 let busstopdata = [];
                 busstopdata = await LoadGetBusesAtBusstop(bs.BusStopCode);
                 const busesatbusstop = ProcessBusstopInfo(busstopdata);
-                // console.log(busesatbusstop);
                 let htmltext = "";
                 for (let b of busesatbusstop)
                 {
@@ -77,9 +95,11 @@ function DrawBusStops(busstops, busstopLayer)
 
             getBuses();
 
+            // function the display the bustiming for a bus stop
             divElement.querySelector(".TimingButton").addEventListener("click", async function(){
                 let timings = await LoadGetBusesAtBusstop(bs.BusStopCode);
                 timings = timings.sort(function(a, b){return a.ServiceNo - b.ServiceNo});
+                // finf and fill data on a popup div
                 const buslist = document.querySelector("#bustimings");
                 buslist.style.display = "block";
                 const tabledata = buslist.querySelector('table');
@@ -92,13 +112,11 @@ function DrawBusStops(busstops, busstopLayer)
                 busestableElement.className = 'center';
                 const header = document.createElement("h3");
                 header.innerHTML = `${bs.Description} - ${bs.BusStopCode} - ${bs.RoadName}`;
-                header.className = 'center';
+                header.className = 'center px-3';
                 buslist.appendChild(header);
+                // go through timing and display the buses info
                 for (let t of timings)
                 {
-                    console.log(t);
-                    let time = Math.round((new Date(t.NextBus.EstimatedArrival) - new Date()) /  60000);
-                    // console.log(time);
                     const bustableElement = document.createElement('tr'); 
                     bustableElement.innerHTML = `
                         <td><span class="busno">${t.ServiceNo}</span></td>
@@ -109,7 +127,6 @@ function DrawBusStops(busstops, busstopLayer)
                     busestableElement.appendChild(bustableElement);
                 }
                 buslist.appendChild(busestableElement);
-                // console.log(timings);
             });
 
             return divElement;
@@ -119,6 +136,10 @@ function DrawBusStops(busstops, busstopLayer)
     }
 }
 
+/**
+ * Function to call geolocation to get current location
+ * @returns geolocation
+ */
 function getLocation() 
 {
     if (navigator.geolocation) 
@@ -127,6 +148,10 @@ function getLocation()
       return "Geolocation is not supported by this browser.";
 }
 
+/**
+ * Function to set current position
+ * @param {Object} position position from geolocation 
+ */
 function showPosition(position)
 {
     USER_POSITION = {
@@ -135,6 +160,11 @@ function showPosition(position)
     };
 }
 
+/**
+ * Function to Center the Map view
+ * @param {Map} map Map Object
+ * @param {LeafletLayer} currentlayer Layer to clear and add current location
+ */
 function centerView(map, currentlayer)
 {
     currentlayer.clearLayers();
@@ -151,9 +181,13 @@ function centerView(map, currentlayer)
     currentlayer.addTo(map);
 }
 
+/**
+ * Function to draw bicycle parking markers on a layer
+ * @param {Array} bicycleparkingdata array of bicycle parking
+ * @param {LeafletLayer} bicycleLayer bicycle parking layer - marker clustering
+ */
 function DrawBicycleParking(bicycleparkingdata,bicycleLayer)
 {
-    // console.log(bicycleparkingdata);
     let bicycleIcon = L.icon({
         iconUrl: 'img/bicycle.png',
     
@@ -161,10 +195,12 @@ function DrawBicycleParking(bicycleparkingdata,bicycleLayer)
         iconAnchor:   [12.5, 12.5], // point of the icon which will correspond to marker's location
         popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
     });
+    // loop through data
     for (let b of bicycleparkingdata)
     {
         const lat = b.Latitude;
         const lng = b.Longitude;
+        // add marker with custom icon and display popup
         const marker = L.marker([lat, lng], {icon: bicycleIcon});
         const shelter = b.ShelterIndicator == 'Y'? "Yes" : "No"; 
         marker.bindPopup(function(){
@@ -181,9 +217,13 @@ function DrawBicycleParking(bicycleparkingdata,bicycleLayer)
     }
 }
 
+/**
+ * Function to draw taxi stand markers on a layer
+ * @param {Array} taxistandsdata array of taxi stands
+ * @param {LeafletLayer} taxistandLayer taxi stands layer - marker clustering
+ */
 function DrawTaxiStands(taxistandsdata,taxistandLayer)
 {
-    // console.log(taxistandsdata);
     let taxiIcon = L.icon({
         iconUrl: 'img/taxi.png',
     
@@ -191,10 +231,12 @@ function DrawTaxiStands(taxistandsdata,taxistandLayer)
         iconAnchor:   [12.5, 12.5], // point of the icon which will correspond to marker's location
         popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
     });
+    // Loop through data
     for (const ts of taxistandsdata) 
     {
         const lat = ts.Latitude;
         const lng = ts.Longitude;
+        // add custom marker with popup
         const marker = L.marker([lat, lng], {icon: taxiIcon});
         marker.bindPopup(function(){
             const divElement = document.createElement('div');
@@ -210,19 +252,25 @@ function DrawTaxiStands(taxistandsdata,taxistandLayer)
     }
 }
 
+/**
+ * Function to Draw Park Connections
+ * @param {GeoJSON} parkconnectorsdata GeoJson for park connections
+ * @returns Layer for Park connections
+ */
 function DrawParkConnectors(parkconnectorsdata)
 {
-    // console.log(parkconnectorsdata);
     const parkconnectorlayer = L.geoJson(parkconnectorsdata,{
+        // the onEachFeatue function is executed on each feature from the geoJson file
+        // parameter 1: the feature object (from the geojson file)
+        // parameter 2: the Leaflet visual representation (ie, a layer) of that feature
         onEachFeature:function(feature, layer) {
-            // console.log(feature);
-            if (feature.geometry.type == "LineString") //<center><table><tr><th colspan='2' align='center'><em>Attributes</em></th></tr><tr bgcolor="#E3E3F3"> <th>PARK</th> <td>Bukit Timah PC (btwn King Albert Park - Adam Rd)</td> </tr><tr bgcolor=""> <th>PCN_LOOP</th> <td>Western Adventure Loop</td> </tr><tr bgcolor="#E3E3F3"> <th>MORE_INFO</th> <td>http://www.nparks.gov.sg/pcn</td> </tr><tr bgcolor=""> <th>INC_CRC</th> <td>F9CECE522DECF3F1</td> </tr><tr bgcolor="#E3E3F3"> <th>FMEL_UPD_D</th> <td>20221031160852</td> </tr></table></center>
+            if (feature.geometry.type == "LineString") 
             {
+                // extract data and add data to popup 
                 let desc = feature.properties.Description;
                 const name = desc.substring(desc.indexOf("<td>") + 4,desc.indexOf("</td>"));
                 let pcn = desc.substring(desc.indexOf("PCN_LOOP") + 18);
                 pcn = pcn.substring(0,pcn.indexOf("</td>"));
-                // console.log(name,pcn);
                 layer.setStyle({
                     'color': "green",
                     'weight': 5
@@ -236,24 +284,13 @@ function DrawParkConnectors(parkconnectorsdata)
         }
     });
     return parkconnectorlayer;
-    // for (let pc of parkconnectorsdata)
-    // {
-    //     // console.log(pc.coordinates);
-    //     let cord = getCoordinates(pc.coordinates);
-    //     // console.log(cord);
-    //     let polyline = L.polyline(cord, {color: 'green', 'weight': 5});
-    //     polyline.bindPopup(function(){
-    //         const divElement = document.createElement('div');
-    //         divElement.innerHTML = `
-    //             <h3>${pc.name}</h3>
-    //         `;
-    //         return divElement;
-    //     });
-    //     parkconnectorLayer.addLayer(polyline);
-    // }
-
 }
 
+/**
+ * Function to draw mrt data on a layer
+ * @param {GeoJSON} mrtdata geojson for mrt data
+ * @returns layer for mrt
+ */
 function DrawMrtLayer(mrtdata)
 {
     const mrtStationLayer = L.geoJson(mrtdata, {
@@ -271,6 +308,7 @@ function DrawMrtLayer(mrtdata)
         // parameter 1: the feature object (from the geojson file)
         // parameter 2: the Leaflet visual representation (ie, a layer) of that feature
         onEachFeature:function(feature, layer) {
+            // if object is a line - Polyline
             if (feature.type == "LineString")
             {
                 layer.setStyle({
@@ -282,6 +320,7 @@ function DrawMrtLayer(mrtdata)
                     <h4>${feature.properties.name} - ${feature.properties.code}</h4>
                 </div>`);
             }
+            // if objet is a feature - marker
             else if (feature.type == "Feature")
             {
                 layer.bindPopup(`
@@ -295,10 +334,13 @@ function DrawMrtLayer(mrtdata)
     return mrtStationLayer;
 }
 
+/**
+ * Function to draw parks from GeoJson file
+ * @param {GeoJSON} parksdata Geojson for park data 
+ * @returns Layer for parks
+ */
 function DrawParks(parksdata)
-{
-    // console.log(parksdata);
-    
+{    
     const parkLayer = L.geoJson(parksdata,{
         pointToLayer: function(feature, latlng) {
             let parkIcon = L.icon({
@@ -308,16 +350,13 @@ function DrawParks(parksdata)
                 iconAnchor:   [12.5, 12.5], // point of the icon which will correspond to marker's location
                 popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
             });
-            // console.log(latlng);
             return L.marker(latlng, {icon: parkIcon});
         },
         onEachFeature:function(feature, layer) {
-            // console.log(feature);
             if (feature.type == "Feature")
             {
                 let desc = feature.properties.Description;
                 let name = desc.substring(desc.indexOf("<td>") + 4,desc.indexOf("</td>"));
-                // console.log(name);
                 layer.bindPopup(`
                 <div>
                     <h4>${name}</h4>
@@ -326,25 +365,15 @@ function DrawParks(parksdata)
         }
     });
     return parkLayer;
-    // for (const p of parksdata) 
-    // {
-    //     const lat = p.location.latitude;
-    //     const lng = p.location.longitude;
-    //     const marker = L.marker([lat, lng], {icon: parkIcon});
-    //     marker.bindPopup(function(){
-    //         const divElement = document.createElement('div');
-    //         divElement.innerHTML = `
-    //             <h3>${p.name}</h3>
-    //         `;
-    //         return divElement;
-    //     });
-    //     marker.addTo(parkLayer);
-    // }
 }
 
+/**
+ * Function to draw carparks on a layer
+ * @param {Array} carparkdata Array of carpark data 
+ * @param {LeafletLayer} carparkLayer car park layer - marker clustering
+ */
 function DrawCarparks(carparkdata,carparkLayer)
 {
-    // console.log(carparkdata);
     let carparkIcon = L.icon({
         iconUrl: 'img/parking.png',
     
@@ -352,14 +381,16 @@ function DrawCarparks(carparkdata,carparkLayer)
         iconAnchor:   [12.5, 12.5], // point of the icon which will correspond to marker's location
         popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
     });
+    // loop though data
     for (const p of carparkdata) 
     {
-        // console.log(p.Location);
+        // skip if no location
         if(!p.Location)
             continue;
         const loc = p.Location.split(" ");
         const lat = loc[0];
         const lng = loc[1];
+        // add marker with custom icon and display popup
         const marker = L.marker([lat, lng], {icon: carparkIcon});
         const lottype = GetLotType(p.LotType)
         marker.bindPopup(function(){
@@ -375,15 +406,15 @@ function DrawCarparks(carparkdata,carparkLayer)
     }
 }
 
-async function PopUpBusTimings(busstopcode,busno)
-{
-    const result = await GetBusTimings(busstopcode,busno);
-    console.log(result.data);
-}
-
+/**
+ * Function to add search results on map
+ * @param {Array} resultlist array of search results
+ * @param {LeafletLayer} resultlayer Layer for results
+ * @param {Map} map Map Object
+ * @param {String} searchterms search terms
+ */
 function AddResultsToMap(resultlist, resultlayer, map, searchterms)
 {
-    // console.log(resultlist);
     resultlayer.clearLayers();
     let resultIcon = L.icon({
         iconUrl: 'img/pin.png',
@@ -392,19 +423,23 @@ function AddResultsToMap(resultlist, resultlayer, map, searchterms)
         iconAnchor:   [12.5, 12.5], // point of the icon which will correspond to marker's location
         popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
     });
+    // get offcanvas and display it
     let offcanvasElement = document.getElementById('offcanvassearch');
     let offcanvas = new bootstrap.Offcanvas(offcanvasElement);
     offcanvas.show();
+    // set header and remove all data of any
     const offcanvasheader = offcanvasElement.querySelector('#offcanvassearchLabel');
     offcanvasheader.innerText = "Search Results for " + searchterms;
     const searchbox = document.querySelector("#offcanvassearchbody");
     if(searchbox.hasChildNodes())
         searchbox.removeChild(searchbox.lastElementChild);
     const searchHolder = document.createElement("div");
+    // loop through data
     for (const r of resultlist) 
     {
         const lat = r.LATITUDE;
         const lng = r.LONGITUDE;
+        // add marker with custom icon and display popup
         const marker = L.marker([lat, lng], {icon: resultIcon});
         marker.bindPopup(function(){
             const divElement = document.createElement('div');
@@ -415,6 +450,7 @@ function AddResultsToMap(resultlist, resultlayer, map, searchterms)
                 <div class="py-1"></div>
                 <button class="directionButton">Get Directions</button>
             `;
+            // event handler for get directions button in pop up
             divElement.querySelector(".directionButton").addEventListener("click", async function(){
                 getLocation();
                 offcanvas.hide();
@@ -436,12 +472,11 @@ function AddResultsToMap(resultlist, resultlayer, map, searchterms)
                 } 
             });
 
-
-
             return divElement;
         });
         marker.addTo(resultlayer);
 
+        // create listing node for off canvas
         const node = document.createElement("div");
         node.classList.add('searchlist')
         node.innerHTML = r.ADDRESS;
@@ -455,9 +490,16 @@ function AddResultsToMap(resultlist, resultlayer, map, searchterms)
     searchbox.appendChild(searchHolder);
 }
 
+/**
+ * Function to add search results on map
+ * @param {Array} resultlist array of search results
+ * @param {LeafletLayer} resultlayer Layer for results
+ * @param {String} searchtype search type
+ * @param {Map} map Map Object
+ * @param {String} searchterms search terms
+ */
 function AddResultsToMapSTB(resultlist, resultlayer, searchtype, map, searchterms)
 {
-    console.log(resultlist);
     let iconname = GetIcon(searchtype);
     resultlayer.clearLayers();
     let resultIcon = L.icon({
@@ -467,19 +509,23 @@ function AddResultsToMapSTB(resultlist, resultlayer, searchtype, map, searchterm
         iconAnchor:   [25, 25], // point of the icon which will correspond to marker's location
         popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
     });
+    // get offcanvas and display it
     let offcanvasElement = document.getElementById('offcanvassearch');
     let offcanvas = new bootstrap.Offcanvas(offcanvasElement);
     offcanvas.show();
+    // set header and remove all data of any
     const offcanvasheader = offcanvasElement.querySelector('#offcanvassearchLabel');
     offcanvasheader.innerText = "Search Results for " + searchterms;
     const searchbox = document.querySelector("#offcanvassearchbody");
     if(searchbox.hasChildNodes())
         searchbox.removeChild(searchbox.lastElementChild);
     const searchHolder = document.createElement("div");
+    // loop through data
     for (const r of resultlist) 
     {
         const lat = r.location.latitude;
         const lng = r.location.longitude;
+        // add marker with custom icon and display popup
         const marker = L.marker([lat, lng], {icon: resultIcon});
         marker.bindPopup(function(){
             const divElement = document.createElement('div');
@@ -491,7 +537,7 @@ function AddResultsToMapSTB(resultlist, resultlayer, searchtype, map, searchterm
                 <div class="py-1"></div>
                 <button class="directionButton">Get Directions</button>
             `;
-
+            // event handler for get directions button in pop up
             divElement.querySelector(".directionButton").addEventListener("click", async function(){
                 getLocation();
                 offcanvas.hide();
@@ -517,6 +563,7 @@ function AddResultsToMapSTB(resultlist, resultlayer, searchtype, map, searchterm
         });
         marker.addTo(resultlayer);
 
+        // create listing node for off canvas
         const node = document.createElement("div");
         node.classList.add('searchlist')
         node.innerHTML = r.name + " - " + ParseAddress(r.address);
@@ -529,16 +576,21 @@ function AddResultsToMapSTB(resultlist, resultlayer, searchtype, map, searchterm
     searchbox.appendChild(searchHolder);
 }
 
+/**
+ * Function to draw route directions on map
+ * @param {Object} route routes from onemap routing
+ * @param {LeafletLayer} directionLayer layer to add directions on
+ */
 function DrawDirectionsOnMap(route,directionLayer)
 {
-    // console.log(route);
     directionLayer.clearLayers();
+    // draw main route
     const r = L.Polyline.fromEncoded(route.route_geometry);
     r.setStyle({
         color:'red'
     })
     r.on('click', onClickRoute);
-    
+    // draw secondary route if any
     if(route.phyroute != null)
     {
         const r2 = L.Polyline.fromEncoded(route.phyroute.route_geometry);
@@ -548,6 +600,7 @@ function DrawDirectionsOnMap(route,directionLayer)
         r2.on('click', onClickRouteAlt);
         r2.addTo(directionLayer);
     }
+    // draw thrid route if any
     if(route.alternativeroute != null)
     {
         const r3 = L.Polyline.fromEncoded(route.alternativeroute[0].route_geometry);
@@ -560,6 +613,12 @@ function DrawDirectionsOnMap(route,directionLayer)
     r.addTo(directionLayer);
 }
 
+/**
+ * Function to add marker to map
+ * @param {Object} location Location to add marker
+ * @param {LeafletLayer} layer layer to add marker to
+ * @param {String} markertype marker type to use
+ */
 function AddMarkerToLayer(location,layer,markertype)
 {
     let newIcon = L.icon({
@@ -575,15 +634,21 @@ function AddMarkerToLayer(location,layer,markertype)
     marker.addTo(layer);
 }
 
+/**
+ * Function to draw directions for pubic transport
+ * @param {Object} route routes from onemap routing
+ * @param {LeafletLayer} directionLayer layer to add directions 
+ */
 function DrawDirectionsOnMapPT(route,directionLayer)
 {
     directionLayer.clearLayers();
+    // for each transport plan
     for(let i in route.plan.itineraries)
     {
-        // console.log(i);
+        // for each leg in the plan
         for(let leg of route.plan.itineraries[i].legs)
         {
-            // console.log(leg);
+            // draw line 
             const r = L.Polyline.fromEncoded(leg.legGeometry.points);
             const rid = (leg.mode == "SUBWAY") ? leg.routeId : leg.mode;
             if(i != 0)

@@ -1,3 +1,4 @@
+// File that calls to LTA Datamall API
 const LTA_DATAMALL_URL = "http://datamall2.mytransport.sg";
 const BUS_STOP_API = "/ltaodataservice/BusStops";
 const TAXI_STANDS_API = "/ltaodataservice/TaxiStands";
@@ -8,7 +9,11 @@ const headerdm = {
   'AccountKey': 'fLf0y6ycSKSzqshZhvw7Gw=='
 };
 
-
+/**
+ * Function that calls to Datamall Bus Stops Api to get All Bus stops
+ * @param {int} skip skip to get rest of search results 
+ * @returns array of bus stops
+ */
 async function LoadBusData(skip = 0)
 {
     const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BUS_STOP_API}`,{
@@ -18,10 +23,14 @@ async function LoadBusData(skip = 0)
         },
         headers : headerdm
     });
-    // console.log(response.data);
     return response.data;
 }
 
+/**
+ * Function that calls to Datamall Bicycle Parking API
+ * @param {Object} location location to search from
+ * @returns array of Bicycle Parkign Locations
+ */
 async function LoadBicycleParking(location)
 {
     const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BICYCLE_PARKING_API}`,{
@@ -34,19 +43,26 @@ async function LoadBicycleParking(location)
         },
         headers : headerdm
     });
-    // console.log(response.data.value);
     return response.data.value;
 } 
 
+/**
+ * Function that calls to Datamall Taxi Stands API
+ * @returns Array of taxi stands
+ */
 async function LoadTaxiStands()
 {
     const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${TAXI_STANDS_API}`,{
         headers : headerdm
     });
-    // console.log(response.data.value);
     return response.data.value;
 }
 
+/**
+ * Function that calls to Datamall Carpark API
+ * @param {int} skip skip to get rest of search results 
+ * @returns array of carparks
+ */
 async function LoadCarParks(skip = 0)
 {
     const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${CARPARKAPI}`,{
@@ -56,10 +72,14 @@ async function LoadCarParks(skip = 0)
         },
         headers : headerdm
     });
-    // console.log(response.data.value);
     return response.data.value;
 }
 
+/**
+ * Function That calls Bus Arrival API to Get Buses and arrival timing from a Bus Stop
+ * @param {String} busstopcode Bus stop code to search by
+ * @returns Buses and timing for the bus stop
+ */
 async function LoadGetBusesAtBusstop(busstopcode)
 {
     const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BUS_ARRIVAL_URL}`,{
@@ -69,10 +89,15 @@ async function LoadGetBusesAtBusstop(busstopcode)
         },
         headers : headerdm
     });
-    // console.log(response.data.Services);
     return response.data.Services;
 }
 
+/**
+ * Function That calls Bus Arrival API to Get a bus timing at a particular bustops
+ * @param {String} busstopcode Bus stop code to search by
+ * @param {String} busno Bus number to search by
+ * @returns Bus info for a bus stop
+ */
 async function GetBusTimings(busstopcode,busno)
 {
     const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BUS_ARRIVAL_URL}`,{
@@ -83,6 +108,5 @@ async function GetBusTimings(busstopcode,busno)
         },
         headers : headerdm
     });
-    // console.log(response.data.Services);
     return response.data.Services;
 }

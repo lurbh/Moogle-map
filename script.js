@@ -1,29 +1,36 @@
+/**
+ * DOM Function to be called when DOM Content is Loaded
+ */
 document.addEventListener("DOMContentLoaded", async function () {
     
+    // Loading of Data and location Settings
     Loading();
-    
     let bustopdata = [];
     let bicycleparkingdata = [];
     let carparkdata = [];
     
     while (true)
     {
-        let rowdata = await LoadBusData(bustopdata.length);
-        // console.log(rowdata.value);
+        const busdataPromise = LoadBusData(bustopdata.length);
+        const rowdata = await busdataPromise;
         bustopdata = bustopdata.concat(rowdata.value);
         if (rowdata.value.length < 500)
             break;
     }
-    const parksdata = await LoadParks();
-    const parkconnectorsdata = await LoadParkConnectors();
-    const taxistandsdata = await LoadTaxiStands();
-    const mrtdata = await LoadMRTGEOJSON();
-    // carparkdata = await LoadCarParks();
+    const parksdataPromise = LoadParks();
+    const parkconnectorsdataPromise = LoadParkConnectors();
+    const taxistandsdataPromise = LoadTaxiStands();
+    const mrtdataPromise = LoadMRTGEOJSON();
+
+    const parksdata = await parksdataPromise;
+    const parkconnectorsdata = await parkconnectorsdataPromise;
+    const taxistandsdata = await taxistandsdataPromise;
+    const mrtdata = await mrtdataPromise;
 
     while(true)
     {
-        let rowdata = await LoadCarParks(carparkdata.length);
-        // console.log(rowdata);
+        let carparkdataPromise = LoadCarParks(carparkdata.length);
+        const rowdata = await carparkdataPromise;
         carparkdata = carparkdata.concat(rowdata)
         if(rowdata.length < 500)
             break;
@@ -31,28 +38,27 @@ document.addEventListener("DOMContentLoaded", async function () {
     
     for(let s in sectors)
     {
-        let data = await LoadBicycleParking(sectors[s]);
+        let dataPromise = LoadBicycleParking(sectors[s]);
+        let data = await dataPromise;
         bicycleparkingdata = bicycleparkingdata.concat(data);
     }
     
+    // Loading of map, Layers and markers once all data is loaded
     let map = LoadMap();
 
     const busstopLayer = L.markerClusterGroup();
     const parkLayer = L.markerClusterGroup();
     const bicycleLayer = L.markerClusterGroup();
     const taxistandLayer = L.markerClusterGroup();
-    // const parkconnectorLayer = L.layerGroup(); 
     const carparkLayer = L.markerClusterGroup();
     const emptylayer = L.layerGroup(); 
     const resultlayer = L.markerClusterGroup();
     const directionLayer = L.layerGroup(); 
     const currentlayer = L.layerGroup(); 
-    // let mrtStationLayer;// = 
+ 
 
     emptylayer.addTo(map);
-    // busstopLayer.addTo(map);
-    // bicycleLayer.addTo(map);
-    // taxistandLayer.addTo(map);
+
     DrawBusStops(bustopdata,busstopLayer);
     DrawBicycleParking(bicycleparkingdata,bicycleLayer);
     const parkholder = DrawParks(parksdata);
@@ -77,11 +83,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     }     
 
     L.control.layers(baseLayers,overlayLayers).addTo(map);
-    // onClickRoute();
-    // onClickSearch();
 
+    /**
+     * Toggle Search Button on click event listener
+     */
     document.querySelector("#toggleSearchBtn").addEventListener("click", function(){
         const searchContainer = document.querySelector("#search-container");
+        const directionContainer = document.querySelector("#directions-container");
         const style = window.getComputedStyle(searchContainer);
         // if the search container is already visible, we'll hide it
         if (style.display != "none") {
@@ -92,6 +100,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         }   
     });
 
+    /**
+     * Toggle Direction Button on click event listener
+     */
     const DirectionBtn = document.querySelector("#directionicon");
     DirectionBtn.addEventListener("click", async function(){
         const directionContainer = document.querySelector("#directions-container");
@@ -108,13 +119,16 @@ document.addEventListener("DOMContentLoaded", async function () {
         } 
     });
 
+    /**
+     * Search Button on click event listener
+     */
     const searchBtn = document.querySelector("#searchBtn");
     searchBtn.addEventListener("click", async function(){
         const searchterms = document.querySelector("#searchText").value;
         const searchtype = document.querySelector("#datasets").value;
-        // console.log(searchtype);
         let resultlist = [];
         
+        // OneMap search and display results
         if(searchtype == "onemap")
         {
             resultlist = await ONEMAPSEARCH(searchterms)
@@ -126,16 +140,15 @@ document.addEventListener("DOMContentLoaded", async function () {
                 // DisplaySearchResults(resultlist, searchterms,map);
             }
         }
+        // STB search and display results
         else
         {
             resultlist = await STBSEARCH(searchterms,searchtype);
-            // console.log(resultlist);
             AddResultsToMapSTB(resultlist, resultlayer, searchtype, map, searchterms);
             resultlayer.addTo(map);
             let goodlocation;
             for(let r of resultlist)
             {
-                console.log(r);
                 if(r.location.latitude != 0 && r.location.longitude != 0)
                 {
                     goodlocation = {
@@ -151,24 +164,36 @@ document.addEventListener("DOMContentLoaded", async function () {
         }      
     });
 
+    /**
+     * Get Directions Button on click event listener
+     */
     const DirectionsBtn = document.querySelector("#DirectionsBtn");
     DirectionsBtn.addEventListener("click", async function(){
         selectRouteType("routedrive");
         GetDirectionsHandler('drive', map, directionLayer);
     });
 
+    /**
+     * Get current Location Button on click event listener
+     */
     const gps = document.querySelector("#gpsimg");
     gps.addEventListener("click", async function(){
         getLocation();
         centerView(map, currentlayer);
     });
 
+    /**
+     * Close Overlay Button on click event listener
+     */
     const closeoverlay = document.querySelector("#busdivclose");
     closeoverlay.addEventListener("click", async function(){
         const buslist = document.querySelector("#bustimings");
         buslist.style.display = "none";
     });
 
+    /**
+     * Get Directions Drive Button on click event listener
+     */
     const routedrive = document.querySelector("#routedrive");
     routedrive.addEventListener("click", async function(){
         if (routedrive.classList.contains('directiontypeselected'))
@@ -177,6 +202,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         GetDirectionsHandler('drive', map, directionLayer);
     });
 
+    /**
+     * Get Directions Public Transport Button on click event listener
+     */
     const routepublic = document.querySelector("#routepublic");
     routepublic.addEventListener("click", async function(){
         if (routepublic.classList.contains('directiontypeselected'))
@@ -185,6 +213,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         GetDirectionsHandlerPT(map, directionLayer);
     });
 
+    /**
+     * Get Directions Cycle Button on click event listener
+     */
     const routecycle = document.querySelector("#routecycle");
     routecycle.addEventListener("click", async function(){
         if (routecycle.classList.contains('directiontypeselected'))
@@ -193,6 +224,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         GetDirectionsHandler('cycle', map, directionLayer);
     });
 
+    /**
+     * Get Directions Walk Button on click event listener
+     */
     const routewalk = document.querySelector("#routewalk");
     routewalk.addEventListener("click", async function(){
         if (routewalk.classList.contains('directiontypeselected'))
@@ -202,15 +236,20 @@ document.addEventListener("DOMContentLoaded", async function () {
         
     });
     
+    /**
+     * Toggle Dark Mode Button on click event listener
+     */
     const darkmode = document.querySelector("#themeimg");
     darkmode.addEventListener("click", async function(){
         const themeid = document.querySelector("#themeid");
         themeid.value = themeid.value == "default" ? "dark" :"default";
-        console.log(themeid.value);
         switchBaseLayer(themeid.value, map);
     });
 });
 
+/**
+ * Loading Function to show loading screen and loading location and onemap verification
+ */
 function Loading()
 {
     const mapholder = document.querySelector("#singaporeMap");
@@ -220,9 +259,13 @@ function Loading()
     LoadOneMap();
 }
 
+/**
+ * Using the route given by OneMap to display direction on the screen (Mode: Driving)
+ * @param {Object} route route info from OneMap
+ */
 function DisplayRouteDirections(route)
 {
-    // console.log(route);
+    // get and show offcanvas set header and remove old content if any
     let offcanvasElement = document.getElementById('offcanvasroute');
     let offcanvas = new bootstrap.Offcanvas(offcanvasElement);
     offcanvas.show();
@@ -231,6 +274,7 @@ function DisplayRouteDirections(route)
     const routebox = document.querySelector("#offcanvasroutebody");
     if(routebox.hasChildNodes())
         routebox.removeChild(routebox.lastElementChild);
+    // create accordion for each route
     const directionsholder = document.createElement("div");
     const routeholder = document.createElement("div");
     let text = `
@@ -244,9 +288,9 @@ function DisplayRouteDirections(route)
                 <div id="collapseOne" class="c collapse show" data-bs-parent="#route1">
                     <div class="accordion-body">
     `;
+    // displaying route instruction
     for( let i of route.route_instructions)
     {
-        // console.log(i[0]);
         text += `<div class='ruoteinstruction'>
         <img class='directiontypeimg' src=${GetDirectionImage(i[0])}>
         ${i[9]} (${ToKMFromM(i[2])})<br/></div>` ;
@@ -257,9 +301,9 @@ function DisplayRouteDirections(route)
         </div>
     </div>
     `;
-    // console.log(text);
     routeholder.innerHTML = text;
     directionsholder.appendChild(routeholder);
+    // check and display another route if any
     if(route.phyroute != null)
     {
         const routeholder = document.createElement("div");
@@ -286,10 +330,10 @@ function DisplayRouteDirections(route)
             </div>
         </div>
         `;
-        // console.log(text);
         routeholder.innerHTML = text;
         directionsholder.appendChild(routeholder);
     }
+    // check and display alternative route if any
     if(route.alternativeroute != null)
     {
         const routeholder = document.createElement("div");
@@ -316,15 +360,19 @@ function DisplayRouteDirections(route)
             </div>
         </div>
         `;
-        // console.log(text);
         routeholder.innerHTML = text;
         directionsholder.appendChild(routeholder);
     }
     routebox.appendChild(directionsholder);
 }
 
+/**
+ * Using the route given by OneMap to display direction on the screen (Mode: Cycling)
+ * @param {Object} route route info from OneMap
+ */
 function DisplayRouteDirectionsCycle(route)
 {
+    // get and show offcanvas set header and remove old content if any
     let offcanvasElement = document.getElementById('offcanvasroute');
     let offcanvas = new bootstrap.Offcanvas(offcanvasElement);
     offcanvas.show();
@@ -333,6 +381,7 @@ function DisplayRouteDirectionsCycle(route)
     const routebox = document.querySelector("#offcanvasroutebody");
     if(routebox.hasChildNodes())
         routebox.removeChild(routebox.lastElementChild);
+    // create accordion for each route
     const directionsholder = document.createElement("div");
     const routeholder = document.createElement("div");
     let text = `
@@ -346,9 +395,9 @@ function DisplayRouteDirectionsCycle(route)
                 <div id="collapseOne" class="c collapse show" data-bs-parent="#route1">
                     <div class="accordion-body">
     `;
+    // displaying route instruction
     for( let i of route.route_instructions)
     {
-        // console.log(i[0]);
         text += `<div class='ruoteinstruction'>
         <img class='directiontypeimg' src=${GetDirectionImage(i[0])}>
         ${i[9]} (${ToKMFromM(i[2])})<br/></div>` ;
@@ -359,9 +408,9 @@ function DisplayRouteDirectionsCycle(route)
         </div>
     </div>
     `;
-    // console.log(text);
     routeholder.innerHTML = text;
     directionsholder.appendChild(routeholder);
+    // check and display another route if any
     if(route.phyroute != null)
     {
         const routeholder = document.createElement("div");
@@ -388,10 +437,10 @@ function DisplayRouteDirectionsCycle(route)
             </div>
         </div>
         `;
-        // console.log(text);
         routeholder.innerHTML = text;
         directionsholder.appendChild(routeholder);
     }
+    // check and display alternative route if any
     if(route.alternativeroute != null)
     {
         const routeholder = document.createElement("div");
@@ -418,17 +467,21 @@ function DisplayRouteDirectionsCycle(route)
             </div>
         </div>
         `;
-        // console.log(text);
         routeholder.innerHTML = text;
         directionsholder.appendChild(routeholder);
     }
     routebox.appendChild(directionsholder);
 }
 
+/**
+ * Using the route given by OneMap to display direction on the screen (Mode: Walking)
+ * @param {Object} route route info from OneMap
+ * @param {Object} from from location info from OneMap
+ * @param {Object} to to location info from OneMap
+ */
 function DisplayRouteDirectionsWalk(route,from,to)
 {
-    console.log(from);
-    console.log(to);
+    // get and show offcanvas set header and remove old content if any
     let offcanvasElement = document.getElementById('offcanvasroute');
     let offcanvas = new bootstrap.Offcanvas(offcanvasElement);
     offcanvas.show();
@@ -437,6 +490,7 @@ function DisplayRouteDirectionsWalk(route,from,to)
     const routebox = document.querySelector("#offcanvasroutebody");
     if(routebox.hasChildNodes())
         routebox.removeChild(routebox.lastElementChild);
+    // create accordion for each route
     const directionsholder = document.createElement("div");
     const routeholder = document.createElement("div");
     let text = `
@@ -450,9 +504,9 @@ function DisplayRouteDirectionsWalk(route,from,to)
                 <div id="collapseOne" class="c collapse show" data-bs-parent="#route1">
                     <div class="accordion-body">
     `;
+    // displaying route instruction
     for( let i of route.route_instructions)
     {
-        // console.log(i[0]);
         text += `<div class='ruoteinstruction'>
         <img class='directiontypeimg' src=${GetDirectionImage(i[0])}>
         ${i[9]} (${ToKMFromM(i[2])})<br/></div>` ;
@@ -463,12 +517,14 @@ function DisplayRouteDirectionsWalk(route,from,to)
         </div>
     </div>
     `;
-    console.log(text);
     routeholder.innerHTML = text;
     directionsholder.appendChild(routeholder);
     routebox.appendChild(directionsholder);
 }
 
+/**
+ * Function to show first route
+ */
 function onClickRoute()
 {
     let offcanvasElement = document.getElementById('offcanvasroute');
@@ -485,6 +541,9 @@ function onClickRoute()
     accordion3.hide();
 }
 
+/**
+ * Function to show second route
+ */
 function onClickRouteAlt()
 {
     let offcanvasElement = document.getElementById('offcanvasroute');
@@ -501,6 +560,9 @@ function onClickRouteAlt()
     accordion3.hide();
 }
 
+/**
+ * Function to show thrid route
+ */
 function onClickRouteAlt2()
 {
     let offcanvasElement = document.getElementById('offcanvasroute');
@@ -517,6 +579,9 @@ function onClickRouteAlt2()
     accordion3.show();
 }
 
+/**
+ * Function to show search canvas
+ */
 function onClickSearch()
 {
     let offcanvasElement = document.getElementById('offcanvassearch');
@@ -524,6 +589,9 @@ function onClickSearch()
     offcanvas.show();
 }
 
+/**
+ * Function to load select options from STB
+ */
 async function LoadSelect()
 {
     const selectList = document.querySelector("#datasets");
@@ -537,35 +605,46 @@ async function LoadSelect()
     }
 }
 
+/**
+ * Function that Handles OneMap searching
+ * @param {String} searchterms terms to search by
+ * @returns the search results
+ */
 async function ONEMAPSEARCH(searchterms)
 {
     let resultlist = [];
     let curpage = 1;
+    // loop to get all search results
     while(true)
     {
-        const response = await SearchOneMap(searchterms, curpage);
-        // console.log(response);
+        const responsePromise = SearchOneMap(searchterms, curpage);
+        const response = await responsePromise;
         curpage = response.pageNum;
         const totalpage = response.totalNumPages;
-        for (let r of response.results)
-            resultlist.push(r);
-        // console.log(response.results.length);
+        resultlist = resultlist.concat(response.results);
         if (curpage == totalpage || response.results.length == 0)
             break;
         else 
             curpage++;
     }
-    // console.log(resultlist);
     return resultlist;
 }
 
+/**
+ * Function that Handles STB searching
+ * @param {String} searchterms terms to search by
+ * @param {String} searchtype database to search from
+ * @returns the search results
+ */
 async function STBSEARCH(searchterms,searchtype)
 {
     let resultlist = [];
     let offset = 0;
+    // loop to get all search results
     while(true)
     {
-        const response = await SearchSTB(searchtype,searchterms,offset);
+        const responsePromise = SearchSTB(searchtype,searchterms,offset);
+        const response = await responsePromise;
         for (let r of response.data)
             resultlist.push(r);
         if (response.totalRecords == resultlist.length)
@@ -576,38 +655,19 @@ async function STBSEARCH(searchterms,searchtype)
     return resultlist;
 }
 
-// function DisplaySearchResults(resultlist, searchterms, map)
-// {
-//     console.log(resultlist);
-//     let offcanvasElement = document.getElementById('offcanvassearch');
-//     let offcanvas = new bootstrap.Offcanvas(offcanvasElement);
-//     offcanvas.show();
-//     const offcanvasheader = offcanvasElement.querySelector('#offcanvassearchLabel');
-//     offcanvasheader.innerText = "Search Results for " + searchterms;
-//     const searchbox = document.querySelector("#offcanvassearchbody");
-//     if(searchbox.hasChildNodes())
-//         searchbox.removeChild(searchbox.lastElementChild);
-//     const searchHolder = document.createElement("div");
-//     for(let r of resultlist)
-//     {
-//         const node = document.createElement("div");
-//         node.classList.add('searchlist')
-//         node.innerHTML = r.ADDRESS;
-//         node.addEventListener("click", function () {
-//             map.flyTo([r.LATITUDE, r.LONGITUDE], 16);
-//             marker.openPopup();
-//         });
-//         searchHolder.appendChild(node);
-//     }
-//     searchbox.appendChild(searchHolder);
-// }
-
+/**
+ * Dispay Search Results from STB
+ * @param {Object} resultlist list of results for search function
+ * @param {string} searchterms terms search by
+ * @param {Map} map map object
+ */
 function DisplaySearchResultsSTB(resultlist, searchterms, map)
 {
-    console.log(resultlist);
+    // get offcanvas and display it
     let offcanvasElement = document.getElementById('offcanvassearch');
     let offcanvas = new bootstrap.Offcanvas(offcanvasElement);
     offcanvas.show();
+    // Set display header and information
     const offcanvasheader = offcanvasElement.querySelector('#offcanvassearchLabel');
     offcanvasheader.innerText = "Search Results for " + searchterms;
     const searchbox = document.querySelector("#offcanvassearchbody");
@@ -615,15 +675,24 @@ function DisplaySearchResultsSTB(resultlist, searchterms, map)
         searchbox.removeChild(searchbox.lastElementChild);
 }
 
+
+/**
+ * Function that handles direction for driving , cycling and walking
+ * @param {string} type type of transport
+ * @param {Map} map map object
+ * @param {layerGroup} directionLayer layer to place routes on
+ */
 async function GetDirectionsHandler(type, map, directionLayer)
 {
+    // get user input and serch the postalcode / address
     const fromvalue = document.querySelector("#startText").value;
     const tovalue = document.querySelector("#endText").value;    
-    const responsefrom = await SearchOneMap(fromvalue);
-    const responseto = await SearchOneMap(tovalue);
-    // console.log(responsefrom);
-    // console.log(responseto);
+    const responsefromPromise = SearchOneMap(fromvalue);
+    const responsetoPromise = SearchOneMap(tovalue);
+    const responsefrom = await responsefromPromise;
+    const responseto = await responsetoPromise;
     let from;
+    // if start location is current location
     if (fromvalue == "My Location")
     {
         getLocation();
@@ -643,12 +712,14 @@ async function GetDirectionsHandler(type, map, directionLayer)
         lat : responseto.results[0].LATITUDE,
         lng : responseto.results[0].LONGITUDE
     };
+    // call get directions api and fly to starting point and place start and end markers and routes to map
     const route = await GetDirections(from,to,type);;
     map.flyTo([from.lat, from.lng], 14);
     DrawDirectionsOnMap(route,directionLayer);
     AddMarkerToLayer(from,directionLayer,MarkerType["FROM"]);
     AddMarkerToLayer(to,directionLayer,MarkerType["TO"]);
     directionLayer.addTo(map);
+    // Handles the displaying of routes for different transport modes
     switch (type) {
         case "drive":
             DisplayRouteDirections(route);
@@ -667,6 +738,10 @@ async function GetDirectionsHandler(type, map, directionLayer)
     
 }
 
+/**
+ * Select and display the current transport mode
+ * @param {String} type transport mode
+ */
 function selectRouteType(type)
 {
     const routedrive = document.querySelector("#routedrive");
@@ -682,15 +757,22 @@ function selectRouteType(type)
     routemain.classList.toggle('directiontype');
 }
 
+/**
+ * Function that handles direction for using public transport
+ * @param {Map} map map object
+ * @param {layerGroup} directionLayer layer to place routes on
+ */
 async function GetDirectionsHandlerPT(map, directionLayer)
 {
+    // get user input and serch the postalcode / address
     const fromvalue = document.querySelector("#startText").value;
     const tovalue = document.querySelector("#endText").value;    
-    const responsefrom = await SearchOneMap(fromvalue);
-    const responseto = await SearchOneMap(tovalue);
-    // console.log(responsefrom);
-    // console.log(responseto);
+    const responsefromPromise = SearchOneMap(fromvalue);
+    const responsetoPromise = SearchOneMap(tovalue);
+    const responsefrom = await responsefromPromise;
+    const responseto = await responsetoPromise;
     let from;
+    // if start location is current location
     if (fromvalue == "My Location")
     {
         getLocation();
@@ -710,6 +792,7 @@ async function GetDirectionsHandlerPT(map, directionLayer)
         lat : responseto.results[0].LATITUDE,
         lng : responseto.results[0].LONGITUDE
     };
+    // call get directions api and fly to starting point and place start and end markers and routes to map
     const route = await GetDirectionsPublicTransport(from,to);
     map.flyTo([from.lat, from.lng], 14);
     DrawDirectionsOnMapPT(route,directionLayer);
@@ -718,21 +801,30 @@ async function GetDirectionsHandlerPT(map, directionLayer)
     directionLayer.addTo(map);
     const fromloc = await GeoCodeFromLatLng(from.lat, from.lng);
     const toloc = await GeoCodeFromLatLng(to.lat, to.lng);
+    // displaying of routes for using public transport
     DisplayRouteDirectionsPT(route, fromloc, toloc);
 }
 
+/**
+ * Display routes information
+ * @param {Object} route routing information
+ * @param {Object} from starting location 
+ * @param {Object} to end location
+ */
 function DisplayRouteDirectionsPT(route, from, to)
 {
+    // get the offcanvas and display it
     let offcanvasElement = document.getElementById('offcanvasroute');
     let offcanvas = new bootstrap.Offcanvas(offcanvasElement);
     offcanvas.show();
+    // set header and remove olf info inf any
     const offcanvasheader = offcanvasElement.querySelector('#offcanvasrouteLabel');
-    // `${from.GeocodeInfo[0].BLOCK} ${from.GeocodeInfo[0].ROAD} to ${to.GeocodeInfo[0].BLOCK} ${to.GeocodeInfo[0].ROAD} (${ToKMFromM(route.route_summary.total_distance)}) in ${ToHrMinsFromSeconds(route.route_summary.total_time)}`;
     offcanvasheader.innerText = `${from.GeocodeInfo[0].BLOCK} ${from.GeocodeInfo[0].ROAD} to ${to.GeocodeInfo[0].BLOCK} ${to.GeocodeInfo[0].ROAD} via Public Transport`;
     const routebox = document.querySelector("#offcanvasroutebody");
     if(routebox.hasChildNodes())
         routebox.removeChild(routebox.lastElementChild);
     const directionsholder = document.createElement("div");
+    // display infomation for all route
     for (let i in route.plan.itineraries) 
     {
         const routeholder = document.createElement("div");
@@ -747,6 +839,7 @@ function DisplayRouteDirectionsPT(route, from, to)
                     <div id="collapse${i+1}" class="c collapse ${i==0?"show":""}" data-bs-parent="#route${i+1}">
                         <div class="accordion-body">
         `;
+        // display info for each route to use
         for( let leg of route.plan.itineraries[i].legs)
         {
             switch(leg.mode)
@@ -775,7 +868,6 @@ function DisplayRouteDirectionsPT(route, from, to)
             </div>
         </div>
         `;
-        // console.log(text);
         routeholder.innerHTML = text;
         directionsholder.appendChild(routeholder);
     }

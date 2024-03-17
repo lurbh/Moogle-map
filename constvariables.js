@@ -1,3 +1,4 @@
+// File that contains Constant Variable that are used in other files
 const CENTER_OF_SG = {
     Lat: '1.3684618391459316',
     Lng: '103.81458257755074'
