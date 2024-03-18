@@ -13,11 +13,18 @@ const headertih = {
  */
 async function GetDataset()
 {
-  const url = `${CORS_URL}${STB_URL}${DATASET_API}`;
-    const response = await axios.get(url,{
-        headers : headertih
-    });
-  return response.data.data;
+  try
+  {
+    const url = `${CORS_URL}${STB_URL}${DATASET_API}`;
+      const response = await axios.get(url,{
+          headers : headertih
+      });
+    return response.data.data;
+  }
+  catch(error)
+  {
+    console.log(error.message)
+  }
 }
 
 /**
@@ -29,17 +36,24 @@ async function GetDataset()
  */
 async function SearchSTB(searchtype,searchterms,offset)
 {
-  const url = `${CORS_URL}${STB_URL}${TIH_SEARCH_API}`;
-  const response = await axios.get(url,{
-      params: 
-      {
-        dataset : searchtype,
-        keyword : searchterms,
-        limit : 50,
-        offset : offset
-      },
-      headers : headertih
-  });
-  return response.data;
+  try
+  {
+    const url = `${CORS_URL}${STB_URL}${TIH_SEARCH_API}`;
+    const response = await axios.get(url,{
+        params: 
+        {
+          dataset : searchtype,
+          keyword : searchterms,
+          limit : 50,
+          offset : offset
+        },
+        headers : headertih
+    });
+    return response.data;
+  }
+  catch(error)
+  {
+    console.log(error.message)
+  }
 }
 

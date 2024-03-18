@@ -25,12 +25,19 @@ async function LoadOneMap()
 /** funtion that calls OneMap API to get Current Access Token */
 async function getAccessToken()
 {
-    let response = await axios.post(`${ONEMAP_URL}${ACCESS_API}`, data, {
-        headers: {
-            'Content-Type': 'application/json'
-          }
-    });
-    return response.data.access_token;
+    try
+    {
+        let response = await axios.post(`${ONEMAP_URL}${ACCESS_API}`, data, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data.access_token;
+    }
+    catch(error)
+    {
+        console.log(error.message)
+    }
 }
 
 /**
@@ -42,16 +49,23 @@ async function getAccessToken()
  */
 async function GetDirections(from,to,routetype)
 {
-    let response = await axios.get(`${ONEMAP_URL}${ROUTING_API}`,{
-        params: 
-        {
-           start : `${from.lat},${from.lng}`,
-           end : `${to.lat},${to.lng}`,
-           routeType : routetype
-        }, 
-        headers: headerom
-    });
-    return response.data;
+    try
+    {
+        let response = await axios.get(`${ONEMAP_URL}${ROUTING_API}`,{
+            params: 
+            {
+            start : `${from.lat},${from.lng}`,
+            end : `${to.lat},${to.lng}`,
+            routeType : routetype
+            }, 
+            headers: headerom
+        });
+        return response.data;
+    }
+    catch(error)
+    {
+      console.log(error.message)
+    }
 }
 
 /**
@@ -63,24 +77,31 @@ async function GetDirections(from,to,routetype)
 async function GetDirectionsPublicTransport(from,to)
 {
     // get current datetime
-    let datetime = new Date();
-    let date = `${PadNo(datetime.getMonth() + 1)}-${PadNo(datetime.getDate())}-${datetime.getFullYear()}`;
-    let time = `${datetime.getHours()}${datetime.getMinutes()}00`;
-    let response = await axios.get(`${ONEMAP_URL}${ROUTING_API}`, {
-        params: 
-        {
-           start : `${from.lat},${from.lng}`,
-           end : `${to.lat},${to.lng}`,
-           routeType : 'pt',
-           date : date,
-           time : time,
-           mode : "TRANSIT",
-           maxWalkDistance : 1000,
-           numItineraries : 3
-        }, 
-        headers: headerom
-    });
-    return response.data;
+    try
+    {
+        let datetime = new Date();
+        let date = `${PadNo(datetime.getMonth() + 1)}-${PadNo(datetime.getDate())}-${datetime.getFullYear()}`;
+        let time = `${datetime.getHours()}${datetime.getMinutes()}00`;
+        let response = await axios.get(`${ONEMAP_URL}${ROUTING_API}`, {
+            params: 
+            {
+            start : `${from.lat},${from.lng}`,
+            end : `${to.lat},${to.lng}`,
+            routeType : 'pt',
+            date : date,
+            time : time,
+            mode : "TRANSIT",
+            maxWalkDistance : 1000,
+            numItineraries : 3
+            }, 
+            headers: headerom
+        });
+        return response.data;
+    }
+    catch(error)
+    {
+      console.log(error.message)
+    }
 }
 
 /**
@@ -91,17 +112,24 @@ async function GetDirectionsPublicTransport(from,to)
  */
 async function SearchOneMap(keyword, pageNo = 1)
 {
-    let response = await axios.get(`${ONEMAP_URL}${ONEMAP_SEARCH_API}`,{
-        params: 
-        {
-           searchVal : keyword,
-           returnGeom : "Y",
-           getAddrDetails : "Y",
-           pageNum : pageNo
-        }, 
-        headers: headerom
-    });
-    return response.data;
+    try
+    {
+        let response = await axios.get(`${ONEMAP_URL}${ONEMAP_SEARCH_API}`,{
+            params: 
+            {
+            searchVal : keyword,
+            returnGeom : "Y",
+            getAddrDetails : "Y",
+            pageNum : pageNo
+            }, 
+            headers: headerom
+        });
+        return response.data;
+    }
+    catch(error)
+    {
+      console.log(error.message)
+    }
 }
 
 /**
@@ -112,16 +140,23 @@ async function SearchOneMap(keyword, pageNo = 1)
  */
 async function GeoCodeFromLatLng(lat,lng)
 {
-    const location = `${lat},${lng}`
-    let response = await axios.get(`${ONEMAP_URL}${REVGEOCODE_API}`,{
-        params: 
-        {
-            location : location,
-            buffer : 100,
-            addressType : "All",
-            otherFeatures : "Y"
-        }, 
-        headers: headerom
-    });
-    return response.data;
+    try
+    {
+        const location = `${lat},${lng}`
+        let response = await axios.get(`${ONEMAP_URL}${REVGEOCODE_API}`,{
+            params: 
+            {
+                location : location,
+                buffer : 100,
+                addressType : "All",
+                otherFeatures : "Y"
+            }, 
+            headers: headerom
+        });
+        return response.data;
+    }
+    catch(error)
+    {
+      console.log(error.message)
+    }
 }

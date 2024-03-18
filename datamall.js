@@ -16,14 +16,21 @@ const headerdm = {
  */
 async function LoadBusData(skip = 0)
 {
-    const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BUS_STOP_API}`,{
-        params: 
-        {
-            $skip : skip
-        },
-        headers : headerdm
-    });
-    return response.data;
+    try
+    {
+        const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BUS_STOP_API}`,{
+            params: 
+            {
+                $skip : skip
+            },
+            headers : headerdm
+        });
+        return response.data;
+    }
+    catch(error)
+    {
+      console.log(error.message)
+    }
 }
 
 /**
@@ -33,17 +40,24 @@ async function LoadBusData(skip = 0)
  */
 async function LoadBicycleParking(location)
 {
-    const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BICYCLE_PARKING_API}`,{
-        params: 
-        {
-            Lat : location.Lat,
-            Long: location.Lng,
-            Dist: 5
+    try
+    {
+        const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BICYCLE_PARKING_API}`,{
+            params: 
+            {
+                Lat : location.Lat,
+                Long: location.Lng,
+                Dist: 5
 
-        },
-        headers : headerdm
-    });
-    return response.data.value;
+            },
+            headers : headerdm
+        });
+        return response.data.value;
+    }
+    catch(error)
+    {
+      console.log(error.message)
+    }
 } 
 
 /**
@@ -52,10 +66,17 @@ async function LoadBicycleParking(location)
  */
 async function LoadTaxiStands()
 {
-    const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${TAXI_STANDS_API}`,{
-        headers : headerdm
-    });
-    return response.data.value;
+    try
+    {
+        const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${TAXI_STANDS_API}`,{
+            headers : headerdm
+        });
+        return response.data.value;
+    }
+    catch(error)
+    {
+      console.log(error.message)
+    }
 }
 
 /**
@@ -65,14 +86,21 @@ async function LoadTaxiStands()
  */
 async function LoadCarParks(skip = 0)
 {
-    const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${CARPARKAPI}`,{
-        params: 
-        {
-            $skip : skip
-        },
-        headers : headerdm
-    });
-    return response.data.value;
+    try
+    {
+        const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${CARPARKAPI}`,{
+            params: 
+            {
+                $skip : skip
+            },
+            headers : headerdm
+        });
+        return response.data.value;
+    }
+    catch(error)
+    {
+      console.log(error.message)
+    }
 }
 
 /**
@@ -82,14 +110,21 @@ async function LoadCarParks(skip = 0)
  */
 async function LoadGetBusesAtBusstop(busstopcode)
 {
-    const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BUS_ARRIVAL_URL}`,{
-        params: 
-        {
-            BusStopCode : busstopcode
-        },
-        headers : headerdm
-    });
-    return response.data.Services;
+    try
+    {
+        const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BUS_ARRIVAL_URL}`,{
+            params: 
+            {
+                BusStopCode : busstopcode
+            },
+            headers : headerdm
+        });
+        return response.data.Services;
+    }
+    catch(error)
+    {
+      console.log(error.message)
+    }
 }
 
 /**
@@ -100,13 +135,20 @@ async function LoadGetBusesAtBusstop(busstopcode)
  */
 async function GetBusTimings(busstopcode,busno)
 {
-    const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BUS_ARRIVAL_URL}`,{
-        params: 
-        {
-            BusStopCode : busstopcode,
-            ServiceNo : busno
-        },
-        headers : headerdm
-    });
-    return response.data.Services;
+    try
+    {
+        const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BUS_ARRIVAL_URL}`,{
+            params: 
+            {
+                BusStopCode : busstopcode,
+                ServiceNo : busno
+            },
+            headers : headerdm
+        });
+        return response.data.Services;
+    }
+    catch(error)
+    {
+      console.log(error.message)
+    }
 }
