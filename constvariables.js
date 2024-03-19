@@ -5,7 +5,7 @@ const CENTER_OF_SG = {
 }; 
 const RADUIS_OF_SG = 30;
 
-const CORS_URL = "http://localhost:8989/";
+const CORS_URL = "";
 
 const sectors = {
     "North": { // 1.444034532117583, 103.81750086987618
