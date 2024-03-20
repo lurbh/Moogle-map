@@ -80,6 +80,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const overlayLayers = {
         'Park Connectors' : parkconnectorLayer,
+        'Search Results' : resultlayer,
+        'Directions' : directionLayer
     }     
 
     L.control.layers(baseLayers,overlayLayers).addTo(map);
@@ -253,7 +255,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 function Loading()
 {
     const mapholder = document.querySelector("#singaporeMap");
-    mapholder.style.background = `url("./img/loading.gif") center center`;
+    mapholder.style.background = `url("./img/loading2.gif") center center`;
     mapholder.style.backgroundRepeat = "no-repeat";
     getLocation();
     LoadOneMap();

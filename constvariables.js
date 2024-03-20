@@ -37,9 +37,9 @@ const lotType = {
 };
 
 const BusLoad = {
-    "SEA" : "#66f542",
+    "SEA" : "#8bff80",
     "SDA" : "#f5cb42",
-    "LSD" : "#de1010"
+    "LSD" : "#ff8080"
 };
 
 const BusType = {
