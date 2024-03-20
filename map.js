@@ -272,7 +272,7 @@ function DrawParkConnectors(parkconnectorsdata)
                 let pcn = desc.substring(desc.indexOf("PCN_LOOP") + 18);
                 pcn = pcn.substring(0,pcn.indexOf("</td>"));
                 layer.setStyle({
-                    'color': "green",
+                    'color': "#2AAA8A",
                     'weight': 5
                 });
                 layer.bindPopup(`
