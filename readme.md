@@ -22,16 +22,16 @@ To use this project, follow these steps:
 
 1. Clone the repository:
 
-git clone https://github.com/lurbh/Project-1.git
+```bash
+    git clone https://github.com/lurbh/Project-1.git
+```
 
 2. Navigate to the project directory:
+```bash
+    cd Project-1
+```
 
-cd Project-1
-
-3. Activate CORS Server for api to use
-node main.js
-
-4. Use Live Server to open webpage
+3. Use Live Server to open webpage
 
 ## Usage
 
