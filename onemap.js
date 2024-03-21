@@ -8,7 +8,7 @@ const ROUTING_API = "/api/public/routingsvc/route";
 const ACCESS_API = "/api/auth/post/getToken";
 const ONEMAP_SEARCH_API= "/api/common/elastic/search";
 const REVGEOCODE_API = "/api/public/revgeocode";
-let ACCESS_TOKEN; //"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2ZjUzZWM1MzYxYzQ2MThlMzFjNDM5MmQ4Y2FkNTQwYiIsImlzcyI6Imh0dHA6Ly9pbnRlcm5hbC1hbGItb20tcHJkZXppdC1pdC0xMjIzNjk4OTkyLmFwLXNvdXRoZWFzdC0xLmVsYi5hbWF6b25hd3MuY29tL2FwaS92Mi91c2VyL3Bhc3N3b3JkIiwiaWF0IjoxNzA4MDUwMTAxLCJleHAiOjE3MDgzMDkzMDEsIm5iZiI6MTcwODA1MDEwMSwianRpIjoiRldNd2dwclJPc3JpakZZQiIsInVzZXJfaWQiOjI2MDIsImZvcmV2ZXIiOmZhbHNlfQ.vzXlf_Cc-OQx9QSghfBSgmTyFoS_vNrWXVu6E-vIakw";
+let ACCESS_TOKEN;
 let headerom;
 
 /**
@@ -27,11 +27,7 @@ async function getAccessToken()
 {
     try
     {
-        let response = await axios.post(`${ONEMAP_URL}${ACCESS_API}`, data, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        let response = await axios.get(`${API_URL}/OneMap`);
         return response.data.access_token;
     }
     catch(error)
@@ -51,16 +47,18 @@ async function GetDirections(from,to,routetype)
 {
     try
     {
-        let response = await axios.get(`${ONEMAP_URL}${ROUTING_API}`,{
+        let response = await axios.get(`${API_URL}/OneMap/Directions`,{
             params: 
             {
-            start : `${from.lat},${from.lng}`,
-            end : `${to.lat},${to.lng}`,
-            routeType : routetype
+                fromlat : from.lat,
+                fromlng : from.lng,
+                tolat : to.lat,
+                tolng : to.lng,
+                routetype : routetype
             }, 
             headers: headerom
         });
-        return response.data;
+        return response.data.data;
     }
     catch(error)
     {
@@ -76,27 +74,19 @@ async function GetDirections(from,to,routetype)
  */
 async function GetDirectionsPublicTransport(from,to)
 {
-    // get current datetime
     try
     {
-        let datetime = new Date();
-        let date = `${PadNo(datetime.getMonth() + 1)}-${PadNo(datetime.getDate())}-${datetime.getFullYear()}`;
-        let time = `${datetime.getHours()}${datetime.getMinutes()}00`;
-        let response = await axios.get(`${ONEMAP_URL}${ROUTING_API}`, {
+        let response = await axios.get(`${API_URL}/OneMap/DirectionsPT`, {
             params: 
             {
-            start : `${from.lat},${from.lng}`,
-            end : `${to.lat},${to.lng}`,
-            routeType : 'pt',
-            date : date,
-            time : time,
-            mode : "TRANSIT",
-            maxWalkDistance : 1000,
-            numItineraries : 3
-            }, 
-            headers: headerom
+                fromlat : from.lat,
+                fromlng : from.lng,
+                tolat : to.lat,
+                tolng : to.lng,
+            }
         });
-        return response.data;
+        console.log(response.data.data)
+        return response.data.data;
     }
     catch(error)
     {
@@ -114,17 +104,14 @@ async function SearchOneMap(keyword, pageNo = 1)
 {
     try
     {
-        let response = await axios.get(`${ONEMAP_URL}${ONEMAP_SEARCH_API}`,{
+        let response = await axios.get(`${API_URL}/OneMap/Search`,{
             params: 
             {
-            searchVal : keyword,
-            returnGeom : "Y",
-            getAddrDetails : "Y",
-            pageNum : pageNo
-            }, 
-            headers: headerom
+                keyword : keyword,
+                pageno : pageNo
+            }
         });
-        return response.data;
+        return response.data.data;
     }
     catch(error)
     {
@@ -142,18 +129,15 @@ async function GeoCodeFromLatLng(lat,lng)
 {
     try
     {
-        const location = `${lat},${lng}`
-        let response = await axios.get(`${ONEMAP_URL}${REVGEOCODE_API}`,{
+        let response = await axios.get(`${API_URL}/OneMap/Geocode`,{
             params: 
             {
-                location : location,
-                buffer : 100,
-                addressType : "All",
-                otherFeatures : "Y"
+                lat : lat,
+                lng : lng,
             }, 
             headers: headerom
         });
-        return response.data;
+        return response.data.data;
     }
     catch(error)
     {

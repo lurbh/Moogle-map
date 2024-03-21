@@ -1,4 +1,5 @@
 // File that calls to LTA Datamall API
+const testapi = "http://localhost:3030/BusStops/"
 const LTA_DATAMALL_URL = "http://datamall2.mytransport.sg";
 const BUS_STOP_API = "/ltaodataservice/BusStops";
 const TAXI_STANDS_API = "/ltaodataservice/TaxiStands";
@@ -18,14 +19,13 @@ async function LoadBusData(skip = 0)
 {
     try
     {
-        const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BUS_STOP_API}`,{
-            params: 
+        const response  = await axios.get(`${API_URL}/BusStops`, {
+            params:  
             {
-                $skip : skip
-            },
-            headers : headerdm
+                skip : skip
+            }
         });
-        return response.data;
+        return response.data.data;
     }
     catch(error)
     {
@@ -42,17 +42,14 @@ async function LoadBicycleParking(location)
 {
     try
     {
-        const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BICYCLE_PARKING_API}`,{
+        const response  = await axios.get(`${API_URL}/BicycleParking`,{
             params: 
             {
-                Lat : location.Lat,
-                Long: location.Lng,
-                Dist: 5
-
-            },
-            headers : headerdm
+                lat : location.Lat,
+                lng: location.Lng,
+            }
         });
-        return response.data.value;
+        return response.data.data;
     }
     catch(error)
     {
@@ -68,10 +65,10 @@ async function LoadTaxiStands()
 {
     try
     {
-        const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${TAXI_STANDS_API}`,{
+        const response  = await axios.get(`${API_URL}/TaxiStands`,{
             headers : headerdm
         });
-        return response.data.value;
+        return response.data.data;
     }
     catch(error)
     {
@@ -88,14 +85,13 @@ async function LoadCarParks(skip = 0)
 {
     try
     {
-        const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${CARPARKAPI}`,{
+        const response  = await axios.get(`${API_URL}/Carpark`,{
             params: 
             {
-                $skip : skip
-            },
-            headers : headerdm
+                skip : skip
+            }
         });
-        return response.data.value;
+        return response.data.data;
     }
     catch(error)
     {
@@ -112,14 +108,8 @@ async function LoadGetBusesAtBusstop(busstopcode)
 {
     try
     {
-        const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BUS_ARRIVAL_URL}`,{
-            params: 
-            {
-                BusStopCode : busstopcode
-            },
-            headers : headerdm
-        });
-        return response.data.Services;
+        const response  = await axios.get(`${API_URL}/BusStops/${busstopcode}`);
+        return response.data.data;
     }
     catch(error)
     {
@@ -137,14 +127,7 @@ async function GetBusTimings(busstopcode,busno)
 {
     try
     {
-        const response  = await axios.get(`${CORS_URL}${LTA_DATAMALL_URL}${BUS_ARRIVAL_URL}`,{
-            params: 
-            {
-                BusStopCode : busstopcode,
-                ServiceNo : busno
-            },
-            headers : headerdm
-        });
+        const response  = await axios.get(`${API_URL}/BusStops/${busstopcode}/${busno}`);
         return response.data.Services;
     }
     catch(error)

@@ -15,11 +15,9 @@ async function GetDataset()
 {
   try
   {
-    const url = `${CORS_URL}${STB_URL}${DATASET_API}`;
-      const response = await axios.get(url,{
-          headers : headertih
-      });
-    return response.data.data;
+    const url = `${API_URL}/Dataset`;
+    const response = await axios.get(url);
+    return response.data;
   }
   catch(error)
   {
@@ -38,18 +36,16 @@ async function SearchSTB(searchtype,searchterms,offset)
 {
   try
   {
-    const url = `${CORS_URL}${STB_URL}${TIH_SEARCH_API}`;
+    const url = `${API_URL}/TIH/Search`;
     const response = await axios.get(url,{
         params: 
         {
-          dataset : searchtype,
-          keyword : searchterms,
-          limit : 50,
+          type : searchtype,
+          terms : searchterms,
           offset : offset
-        },
-        headers : headertih
+        }
     });
-    return response.data;
+    return response.data.data;
   }
   catch(error)
   {
