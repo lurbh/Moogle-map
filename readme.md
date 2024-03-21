@@ -13,6 +13,9 @@ The Moogle map project aims to provide similar features to Google Maps for the c
 - Provides basic interaction such as zooming and panning.
 - Utilizes additional APIs for features such as routing, geocoding, and place search.
 
+## Live Link
+https://mooglemap.netlify.app
+
 ## Installation
 
 To use this project, follow these steps:
