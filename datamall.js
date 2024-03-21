@@ -1,15 +1,4 @@
-// File that calls to LTA Datamall API
-const testapi = "http://localhost:3030/BusStops/"
-const LTA_DATAMALL_URL = "http://datamall2.mytransport.sg";
-const BUS_STOP_API = "/ltaodataservice/BusStops";
-const TAXI_STANDS_API = "/ltaodataservice/TaxiStands";
-const BICYCLE_PARKING_API = "/ltaodataservice/BicycleParkingv2";
-const CARPARKAPI = "/ltaodataservice/CarParkAvailabilityv2";
-const BUS_ARRIVAL_URL = "/ltaodataservice/BusArrivalv2";
-const headerdm = { 
-  'AccountKey': 'fLf0y6ycSKSzqshZhvw7Gw=='
-};
-
+// File that calls to LTA Datamall API on Custom API
 /**
  * Function that calls to Datamall Bus Stops Api to get All Bus stops
  * @param {int} skip skip to get rest of search results 
@@ -65,9 +54,7 @@ async function LoadTaxiStands()
 {
     try
     {
-        const response  = await axios.get(`${API_URL}/TaxiStands`,{
-            headers : headerdm
-        });
+        const response  = await axios.get(`${API_URL}/TaxiStands`);
         return response.data.data;
     }
     catch(error)

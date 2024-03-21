@@ -1,11 +1,4 @@
-// File that calls to STB API
-const STB_URL = "https://api.stb.gov.sg";
-const DATASET_API = "/content/common/v2/datasets";
-const TIH_SEARCH_API = "/content/common/v2/search";
-const MEDIA_DOWNLOAD_API = "/media/download/v2/";
-const headertih = { 
-  'x-api-key': 'XAmWJadZKDzaZNjoY9B5RzK9pmGhL8sz',
-};
+// File that calls to STB API on Custom API
 
 /**
  * Function that gets datasets from stb to use for searching

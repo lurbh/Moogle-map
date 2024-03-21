@@ -1,15 +1,5 @@
-// File that calls to OneMap API
-const data = JSON.stringify({
-    "email": "bison.chalk814@eagereverest.com",
-    "password": "^W^Vx$RfyBy7xM56v3bj"
-});
-const ONEMAP_URL = "https://www.onemap.gov.sg";
-const ROUTING_API = "/api/public/routingsvc/route";
-const ACCESS_API = "/api/auth/post/getToken";
-const ONEMAP_SEARCH_API= "/api/common/elastic/search";
-const REVGEOCODE_API = "/api/public/revgeocode";
+// File that calls to OneMap API on Custom API
 let ACCESS_TOKEN;
-let headerom;
 
 /**
  * Function That loads Onemap API Access Token and assigns it for use
@@ -17,9 +7,6 @@ let headerom;
 async function LoadOneMap()
 {
     ACCESS_TOKEN = await getAccessToken();
-    headerom = {
-        Authorization : `${ACCESS_TOKEN}`
-    }
 }
 
 /** funtion that calls OneMap API to get Current Access Token */
@@ -55,8 +42,7 @@ async function GetDirections(from,to,routetype)
                 tolat : to.lat,
                 tolng : to.lng,
                 routetype : routetype
-            }, 
-            headers: headerom
+            }
         });
         return response.data.data;
     }
@@ -134,8 +120,7 @@ async function GeoCodeFromLatLng(lat,lng)
             {
                 lat : lat,
                 lng : lng,
-            }, 
-            headers: headerom
+            }
         });
         return response.data.data;
     }
